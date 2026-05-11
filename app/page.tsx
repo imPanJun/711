@@ -1,5 +1,6 @@
-import { HomeInteractive } from "@/components/openpoint/home-interactive"
+import { HomeInteractive } from '@/components/openpoint/home-interactive';
 
 export default function HomePage() {
-  return <HomeInteractive />
+  // 直接回傳 App 內容，不加任何多餘的外殼
+  return <HomeInteractive />;
 }

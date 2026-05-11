@@ -289,50 +289,66 @@ function PrintQRCodeScreen({ onBack }: { onBack: () => void }) {
 // ==========================================
 // 兌換券與預約取貨 (更新品項)
 // ==========================================
+// ==========================================
+// 兌換券與預約取貨 (★ 徹底根除彈窗 Bug 修正版)
+// ==========================================
 function CouponsScreen({ onBack }: { onBack: () => void }) {
-  const [view, setView] = useState<'list' | 'options' | 'qr' | 'location' | 'store' | 'time' | 'success'>('list');
+  // ★ 將原本複雜的 view 狀態簡化
+  const [view, setView] = useState<'list' | 'qr' | 'store' | 'time' | 'success'>('list');
   const [selectedCoupon, setSelectedCoupon] = useState<any>(null);
   const [selectedStore, setSelectedStore] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
 
+  // 兌換券品項
   const coupons = [
     { id: 1, title: "美式咖啡 8 折券", subtitle: "限時優惠 (學餐消費回饋)", expiry: "今天 20:00 前有效", color: "bg-orange-500", highlight: true },
     { id: 2, title: "波霸珍珠奶茶", subtitle: "嘗鮮價 9 折 (早八打卡獎勵)", expiry: "2026/05/15", color: "bg-amber-500" },
     { id: 3, title: "拿鐵咖啡 9 折券", subtitle: "全品項適用", expiry: "2026/05/01", color: "bg-[var(--op-green)]" },
   ];
 
+  // LBS 模擬門市資料
   const nearbyStores = [
     { id: 's1', name: '台科大一餐門市', distance: '100m' },
     { id: 's2', name: '台科大第三宿舍門市', distance: '250m' },
     { id: 's3', name: '公館基隆路門市', distance: '400m' },
   ];
 
+  // 預約時間選項
   const timeSlots = ["現在 (立即準備)", "14:30", "15:00", "15:30", "16:00", "16:30"];
 
+  // ★ 邏輯修正：點擊使用後，推薦券直接去選門市，一般券直接去顯示條碼！
   const handleUseCoupon = (coupon: any) => {
     setSelectedCoupon(coupon);
-    setView('options');
+    if (coupon.highlight) {
+      setView('store');
+    } else {              // 👉 就是少了這個 else 包住它！
+      setView('qr');
+    }
   };
 
+  // ★ 返回邏輯修正：簡化返回路徑
   const internalBack = () => {
-    if (view === 'options') setView('list');
-    else if (view === 'qr' || view === 'location') setView('options');
-    else if (view === 'store') setView('options'); 
-    else if (view === 'time') setView('store');
+    if (view === 'qr') setView('list');
+    else if (view === 'store') setView('list'); // ★ 從選門市返回列表
+    else if (view === 'time') setView('store'); // ★ 從選時間返回選門市
     else if (view === 'success') { setView('list'); onBack(); } 
     else onBack();
   };
 
   return (
     <div className="flex flex-col h-full bg-muted/30">
-      <div className="p-4 bg-card border-b flex items-center shrink-0">
-        <BackButton onClick={view === 'list' ? onBack : internalBack} />
-        <h1 className="w-full text-lg font-bold text-center pr-8">
-          {view === 'list' ? '我的兌換券' : view === 'options' ? '選擇兌換方式' : view === 'qr' ? '櫃台兌換條碼' : view === 'success' ? '預約成功' : '預約自取'}
+      <div className="p-4 bg-card border-b flex items-center shrink-0 relative">
+        {/* 在 iPhone 外殼內，需要確保返回按鈕更好點擊 */}
+        <div className="absolute left-4 z-10">
+          <BackButton onClick={view === 'list' ? onBack : internalBack} />
+        </div>
+        <h1 className="w-full text-lg font-bold text-center pr-8 text-slate-800">
+          {view === 'list' ? '我的兌換券' : view === 'qr' ? '櫃台兌換條碼' : view === 'success' ? '預約成功' : '預約自取'}
         </h1>
       </div>
 
       <div className="flex-1 overflow-y-auto">
+        {/* 狀態 1：兌換券列表 */}
         {view === 'list' && (
           <div className="p-4 space-y-4 animate-in fade-in duration-300">
             {coupons.map((coupon) => (
@@ -350,7 +366,9 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
                     </div>
                   </div>
                   <div className="flex items-center pr-4">
-                    <Button onClick={() => handleUseCoupon(coupon)} size="sm" className={`${coupon.color} hover:opacity-90 text-white shadow-sm`}>使用</Button>
+                    <Button onClick={() => handleUseCoupon(coupon)} size="sm" className={`${coupon.color} hover:opacity-90 text-white shadow-sm active:scale-95`}>
+                      使用
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -358,34 +376,7 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
           </div>
         )}
 
-        {view === 'options' && (
-          <div className="p-6 flex flex-col gap-5 animate-in slide-in-from-right-4 fade-in duration-300 h-full justify-center pb-20">
-            <div className="text-center mb-4">
-              <h2 className="text-xl font-bold text-slate-800 mb-2">{selectedCoupon?.title}</h2>
-              <p className="text-sm text-slate-500">請選擇您偏好的兌換方式</p>
-            </div>
-            <button onClick={() => setView('qr')} className="w-full bg-white border-2 border-slate-200 rounded-3xl p-6 flex flex-col items-center gap-4 hover:border-orange-400 hover:bg-orange-50 transition-all active:scale-95 group shadow-sm">
-              <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
-                <QrCode className="h-8 w-8 text-slate-600 group-hover:text-orange-600" />
-              </div>
-              <div className="text-center">
-                <h3 className="font-bold text-lg text-slate-800 group-hover:text-orange-700">臨櫃出示條碼兌換</h3>
-                <p className="text-sm text-slate-500 mt-1">適合剛好在門市的您，請由店員刷讀</p>
-              </div>
-            </button>
-            <button onClick={() => setView('location')} className="w-full bg-white border-2 border-orange-400 rounded-3xl p-6 flex flex-col items-center gap-4 bg-gradient-to-b from-orange-50 to-white hover:from-orange-100 hover:to-orange-50 transition-all active:scale-95 group shadow-md relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">推薦</div>
-              <div className="h-16 w-16 rounded-full bg-orange-100 flex items-center justify-center group-hover:bg-orange-200 transition-colors">
-                <Smartphone className="h-8 w-8 text-orange-600" />
-              </div>
-              <div className="text-center">
-                <h3 className="font-bold text-lg text-orange-700">預約門市自取 (免排隊)</h3>
-                <p className="text-sm text-slate-500 mt-1">選好時間與門市，到店直接拿走超省時</p>
-              </div>
-            </button>
-          </div>
-        )}
-
+        {/* 狀態 2：櫃台兌換條碼 */}
         {view === 'qr' && (
           <div className="p-6 flex flex-col items-center h-full animate-in zoom-in-95 duration-300">
             <h2 className="text-lg font-bold text-slate-800 mb-6 mt-4">{selectedCoupon?.title}</h2>
@@ -404,20 +395,7 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
           </div>
         )}
 
-        {view === 'location' && (
-          <div className="p-6 flex flex-col items-center justify-center h-full animate-in fade-in duration-300 pb-20">
-            <div className="w-24 h-24 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mb-6">
-              <Navigation className="h-12 w-12" />
-            </div>
-            <h2 className="text-xl font-bold text-slate-800 mb-2">允許存取您的位置</h2>
-            <p className="text-center text-slate-500 text-sm mb-8 px-4">
-              為了幫您尋找離您最近的門市進行預約自取，我們需要取得您的位置資訊。
-            </p>
-            <Button onClick={() => setView('store')} className="w-full max-w-[250px] bg-blue-500 hover:bg-blue-600 text-white font-bold py-6 rounded-2xl shadow-md text-lg">允許存取</Button>
-            <button onClick={() => setView('options')} className="mt-4 text-sm text-slate-400 font-medium p-2">稍後再說</button>
-          </div>
-        )}
-
+        {/* 狀態 3：選擇門市清單 (原本的 Location 彈窗已被物理刪除！) */}
         {view === 'store' && (
           <div className="p-4 animate-in slide-in-from-right-4 duration-300">
             <h2 className="text-sm font-bold text-slate-700 mb-3 px-1">請選擇預約取貨門市</h2>
@@ -427,7 +405,7 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
                   <div className="flex items-center">
                     <div className="bg-orange-100 p-2.5 rounded-full mr-3 text-orange-600"><Store className="h-5 w-5" /></div>
                     <div className="text-left">
-                      <h3 className="font-bold text-slate-800">{store.name}</h3>
+                      <h3 className="font-bold text-slate-800 text-sm">{store.name}</h3>
                       <p className="text-xs text-slate-500 flex items-center mt-1"><MapPin className="h-3 w-3 mr-0.5" /> 距離您約 {store.distance}</p>
                     </div>
                   </div>
@@ -438,21 +416,22 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
           </div>
         )}
 
+        {/* 狀態 4：選擇時間 */}
         {view === 'time' && (
           <div className="p-4 animate-in slide-in-from-right-4 duration-300 h-full flex flex-col">
-            <div className="bg-orange-50 border border-orange-100 rounded-xl p-3 mb-5 flex items-center">
+            <div className="bg-orange-50 border border-orange-100 rounded-xl p-3 mb-5 flex items-center shrink-0">
               <Store className="h-5 w-5 text-orange-500 mr-2 shrink-0" />
               <p className="text-sm text-orange-800 font-medium">已選擇：{selectedStore}</p>
             </div>
-            <h2 className="text-sm font-bold text-slate-700 mb-3 px-1">請選擇預計取貨時間</h2>
-            <div className="grid grid-cols-2 gap-3 mb-8">
+            <h2 className="text-sm font-bold text-slate-700 mb-3 px-1 shrink-0">請選擇預計取貨時間</h2>
+            <div className="grid grid-cols-2 gap-3 mb-8 flex-1 overflow-y-auto">
               {timeSlots.map(time => (
-                <button key={time} onClick={() => setSelectedTime(time)} className={`py-3.5 rounded-xl border-2 font-bold text-sm transition-all ${selectedTime === time ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-slate-200 bg-white text-slate-600 hover:border-orange-300'}`}>
+                <button key={time} onClick={() => setSelectedTime(time)} className={`py-3.5 h-16 rounded-xl border-2 font-bold text-sm transition-all ${selectedTime === time ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-slate-200 bg-white text-slate-600 hover:border-orange-300'}`}>
                   {time}
                 </button>
               ))}
             </div>
-            <div className="mt-auto pt-4 pb-2">
+            <div className="mt-auto pt-4 pb-2 shrink-0">
               <Button onClick={() => setView('success')} disabled={!selectedTime} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 rounded-2xl shadow-lg active:scale-95 transition-all text-lg disabled:opacity-50 disabled:active:scale-100">
                 確認預約
               </Button>
@@ -460,6 +439,7 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
           </div>
         )}
 
+        {/* 狀態 5：預約成功 */}
         {view === 'success' && (
           <div className="p-6 flex flex-col items-center justify-center h-full animate-in zoom-in-95 duration-500 pb-20">
             <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-green-100 shadow-inner">
@@ -468,16 +448,17 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
             <h2 className="text-2xl font-black text-slate-800 mb-2">預約成功！</h2>
             <p className="text-slate-500 text-center mb-8">門市已收到您的訂單<br/>請於 <span className="font-bold text-orange-600">{selectedTime}</span> 前往 <span className="font-bold text-orange-600">{selectedStore}</span> 領取。</p>
             <div className="w-full bg-white rounded-2xl p-5 shadow-sm border border-slate-100 mb-8">
-              <h3 className="font-bold text-slate-800 mb-1">{selectedCoupon?.title}</h3>
+              <h3 className="font-bold text-slate-800 mb-1 text-sm">{selectedCoupon?.title}</h3>
               <p className="text-xs text-slate-500 mb-4">預約編號：#OP883921</p>
               
+              {/* 取件序號 */}
               <div className="w-full bg-slate-100 rounded-lg p-3 text-center border border-slate-200">
                 <p className="text-lg font-mono font-bold text-slate-700 tracking-widest">AB98-7654-3210</p>
               </div>
               <p className="text-xs text-center mt-3 text-slate-400">到店時請向店員出示此兌換序號</p>
             </div>
             <Button onClick={internalBack} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-6 rounded-2xl shadow-md active:scale-95 transition-all text-lg">
-              回首頁
+              回列表
             </Button>
           </div>
         )}
@@ -486,9 +467,6 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
   )
 }
 
-// ==========================================
-// 學餐支付 Screen
-// ==========================================
 function CampusPayScreen({ onBack }: { onBack: () => void }) {
   const [payState, setPayState] = useState<'paying' | 'processing' | 'success'>('paying');
 
@@ -582,15 +560,11 @@ function CampusPayScreen({ onBack }: { onBack: () => void }) {
   );
 }
 
-// ==========================================
-// Foodomo 外送揪團 (★ 獨立菜單與複製回饋升級)
-// ==========================================
 function FoodomoGroupScreen({ setActiveScreen }: { setActiveScreen: (screen: ScreenType) => void }) {
   const [view, setView] = useState<'init' | 'host_select_store' | 'host_room_created' | 'member_enter_code' | 'menu' | 'payment' | 'status' | 'success'>('init');
   const [role, setRole] = useState<'host' | 'member'>('host');
   const [roomCode, setRoomCode] = useState('');
   
-  // ★ 1. 真實餐廳資料結構
   const restaurants = [
     { 
       id: 'starbucks', name: "星巴克 (台科大店)", min: 200, fee: 45, 
@@ -610,7 +584,6 @@ function FoodomoGroupScreen({ setActiveScreen }: { setActiveScreen: (screen: Scr
   const currentStore = restaurants.find(r => r.id === selectedStoreId) || restaurants[0];
   const [copied, setCopied] = useState(false);
 
-  // 購物車與計價 (與目前餐廳連動)
   const [cart, setCart] = useState<{ [key: string]: number }>({});
   
   const addItem = (id: string) => setCart(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
@@ -625,7 +598,7 @@ function FoodomoGroupScreen({ setActiveScreen }: { setActiveScreen: (screen: Scr
   const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
 
   const [members, setMembers] = useState<any[]>([]);
-  const deliveryFee = currentStore.fee; // ★ 自動抓取該餐廳外送費
+  const deliveryFee = currentStore.fee;
   const feePerPerson = members.length > 0 ? Math.round(deliveryFee / members.length) : 0;
 
   const handleKick = (id: number) => setMembers(prev => prev.filter(m => m.id !== id));
