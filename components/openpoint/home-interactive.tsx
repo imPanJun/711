@@ -15,7 +15,6 @@ import {
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
-// ★ 擴充所有的畫面類型，確保每一個按鈕都有歸宿
 type ScreenType = 'home' | 'print' | 'coupons' | 'referral' | 'campus_pay' | 'foodomo' | 'ifood_radar' | 
   'fast_pass_unlock' | 'fast_pass_scanner' | 'fast_pass_generated_qr' | 
   'nav_pay_unlock' | 'nav_pay_barcode' | 'mobile_pickup' | 'op_points' | 'seven_points' | 'powerbank_map' | 'package_service' |
@@ -240,7 +239,7 @@ function PrintQRCodeScreen({ onBack }: { onBack: () => void }) {
 }
 
 // ==========================================
-// 兌換券與預約取貨 (★ 雙選擇介面)
+// 兌換券與預約取貨 (雙選擇介面)
 // ==========================================
 function CouponsScreen({ onBack }: { onBack: () => void }) {
   const [view, setView] = useState<'list' | 'options' | 'qr' | 'store' | 'time' | 'success'>('list');
@@ -264,7 +263,7 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
 
   const handleUseCoupon = (coupon: any) => {
     setSelectedCoupon(coupon);
-    setView('options'); // ★ 點擊使用後，跳出「選擇兌換方式」畫面
+    setView('options');
   };
 
   const internalBack = () => {
@@ -315,14 +314,12 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
           </div>
         )}
 
-        {/* 雙軌選擇畫面 */}
         {view === 'options' && (
           <div className="p-6 flex flex-col gap-5 animate-in slide-in-from-right-4 fade-in duration-300 h-full justify-center pb-20">
             <div className="text-center mb-4">
               <h2 className="text-xl font-bold text-slate-800 mb-2">{selectedCoupon?.title}</h2>
               <p className="text-sm text-slate-500">請選擇您偏好的兌換方式</p>
             </div>
-            {/* 選項 1：出示 QR Code */}
             <button onClick={() => setView('qr')} className="w-full bg-white border-2 border-slate-200 rounded-3xl p-6 flex flex-col items-center gap-4 hover:border-[#F26722] hover:bg-orange-50 transition-all active:scale-95 group shadow-sm">
               <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
                 <QrCode className="h-8 w-8 text-slate-600 group-hover:text-[#F26722]" />
@@ -332,7 +329,6 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
                 <p className="text-sm text-slate-500 mt-1">適合剛好在門市的您，請由店員刷讀</p>
               </div>
             </button>
-            {/* 選項 2：預約領取咖啡 (跳過地圖權限，直接到門市清單) */}
             <button onClick={() => setView('store')} className="w-full bg-white border-2 border-[#F26722] rounded-3xl p-6 flex flex-col items-center gap-4 bg-gradient-to-b from-orange-50 to-white hover:from-orange-100 hover:to-orange-50 transition-all active:scale-95 group shadow-md relative overflow-hidden">
               <div className="absolute top-0 right-0 bg-[#F26722] text-white text-xs font-bold px-3 py-1 rounded-bl-xl">免排隊</div>
               <div className="h-16 w-16 rounded-full bg-orange-100 flex items-center justify-center group-hover:bg-orange-200 transition-colors">
@@ -350,9 +346,7 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
           <div className="p-6 flex flex-col items-center h-full animate-in zoom-in-95 duration-300">
             <h2 className="text-lg font-bold text-slate-800 mb-6 mt-4">{selectedCoupon?.title}</h2>
             <div className="bg-white p-6 rounded-[32px] shadow-xl border border-slate-100 mb-8 w-full max-w-[280px] flex flex-col items-center">
-              <svg width="200" height="200" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="text-slate-900 mb-4">
-                <path fill="currentColor" d="M0,0 h30 v30 h-30 z M5,5 v20 h20 v-20 z M10,10 h10 v10 h-10 z M70,0 h30 v30 h-30 z M75,5 v20 h20 v-20 z M80,10 h10 v10 h-10 z M0,70 h30 v30 h-30 z M5,75 v20 h20 v-20 z M10,80 h10 v10 h-10 z M40,0 h20 v10 h-20 z M40,20 h10 v20 h-10 z M60,10 h10 v10 h-10 z M50,40 h20 v20 h-20 z M80,40 h20 v10 h-20 z M70,60 h10 v20 h-10 z M40,70 h20 v10 h-20 z M40,90 h10 v10 h-10 z M80,80 h20 v20 h-20 z M85,85 h10 v10 h-10 z M20,40 h10 v20 h-10 z M0,40 h10 v10 h-10 z M0,55 h20 v10 h-20 z M35,35 h10 v10 h-10 z M65,75 h10 v10 h-10 z M15,60 h10 v10 h-10 z"/>
-              </svg>
+              <QrCode className="h-40 w-40 text-slate-900 mb-4" />
               <div className="w-full h-16 bg-slate-800 rounded flex items-center justify-center relative overflow-hidden mb-2">
                 <div className="absolute inset-y-2 left-3 right-3 flex gap-[2px]">
                   {Array.from({ length: 40 }).map((_, i) => <div key={i} className={`h-full ${Math.random() > 0.5 ? 'w-1' : 'w-[2px]'} bg-white`} />)}
@@ -433,52 +427,54 @@ function CouponsScreen({ onBack }: { onBack: () => void }) {
 }
 
 // ==========================================
-// 學餐支付 Screen
+// 學餐支付 Screen (掃碼付款，保留申報功能)
 // ==========================================
 function CampusPayScreen({ onBack }: { onBack: () => void }) {
-  const [payState, setPayState] = useState<'paying' | 'processing' | 'success'>('paying');
+  const [payState, setPayState] = useState<'paying' | 'processing' | 'success' | 'report'>('paying');
+  const [storeName, setStoreName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSimulatePay = () => {
     setPayState('processing');
     setTimeout(() => setPayState('success'), 1500);
   };
 
+  const handleInternalBack = () => {
+    if (payState === 'report') setPayState('success');
+    else onBack();
+  };
+
   return (
     <div className="flex flex-col h-full bg-slate-50">
       <div className="p-4 bg-white border-b flex items-center justify-between shrink-0 shadow-sm">
-        <BackButton onClick={onBack} />
-        <h1 className="text-lg font-bold text-slate-800">學餐支付</h1>
+        <BackButton onClick={handleInternalBack} />
+        <h1 className="text-lg font-bold text-slate-800">
+          {payState === 'report' ? '店家申報與補領' : '學餐支付 (掃碼)'}
+        </h1>
         <div className="w-16"></div>
       </div>
 
       {payState === 'paying' && (
-        <div className="flex-1 p-4 flex flex-col items-center overflow-auto pb-24 animate-in fade-in duration-300">
-          <div className="w-full bg-green-50 text-green-700 px-4 py-3 rounded-xl font-bold text-sm mb-6 flex items-center justify-center border border-green-200 shadow-sm">
+        <div className="flex-1 p-6 flex flex-col items-center overflow-auto pb-10 animate-in fade-in duration-300">
+          <div className="w-full bg-green-50 text-green-700 px-4 py-3 rounded-xl font-bold text-sm mb-8 flex items-center justify-center border border-green-200 shadow-sm shrink-0">
             <Utensils className="h-4 w-4 mr-2" />現在買學餐，筆筆送 OP 折價券！
           </div>
-          <div className="w-full bg-white p-4 rounded-2xl shadow-sm mb-6 border border-slate-200">
-            <p className="text-xs text-slate-500 text-center mb-2">付款碼（一維條碼）</p>
-            <div className="h-16 bg-slate-800 rounded flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-y-2 left-2 right-2 flex gap-[2px]">
-                {Array.from({ length: 40 }).map((_, i) => <div key={i} className={`h-full ${Math.random() > 0.5 ? 'w-1' : 'w-[2px]'} bg-white`} />)}
-              </div>
-              <Barcode className="h-6 w-6 text-white/20 absolute" />
+          
+          <div className="flex-1 flex flex-col items-center justify-center w-full mb-8">
+            <div className="w-60 h-60 border-[3px] border-slate-200 rounded-3xl relative overflow-hidden bg-slate-100 shadow-inner shrink-0">
+              <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-[#4CAF50] rounded-tl-3xl"></div>
+              <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-[#4CAF50] rounded-tr-3xl"></div>
+              <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-[#4CAF50] rounded-bl-3xl"></div>
+              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-[#4CAF50] rounded-br-3xl"></div>
+              {/* 掃描線動畫 */}
+              <div className="absolute top-1/2 left-0 w-full h-[2px] bg-[#4CAF50] shadow-[0_0_10px_2px_rgba(76,175,80,0.6)] animate-pulse"></div>
             </div>
-            <p className="text-xs text-center mt-2 font-mono text-slate-500">4711 8823 0987 6543</p>
+            <p className="mt-8 text-sm font-bold text-slate-600 text-center">請將鏡頭對準店家收款碼</p>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 w-full flex flex-col items-center">
-            <p className="text-xs text-slate-500 text-center mb-2">掃描碼（QR Code）</p>
-            <div className="w-40 h-40 bg-slate-800 rounded-lg flex items-center justify-center relative">
-              <div className="absolute inset-4 grid grid-cols-7 gap-1">
-                {Array.from({ length: 49 }).map((_, i) => <div key={i} className={`aspect-square rounded-sm ${Math.random() > 0.5 ? 'bg-white' : 'bg-transparent'}`} />)}
-              </div>
-              <QrCode className="h-10 w-10 text-white/20 absolute" />
-            </div>
-          </div>
-          <p className="mt-6 text-sm text-slate-500 text-center">請出示此畫面給店家掃描</p>
-          <div className="mt-8 w-full">
+
+          <div className="mt-auto w-full shrink-0">
             <Button onClick={handleSimulatePay} className="w-full bg-[#4CAF50] hover:bg-green-600 text-white font-bold py-6 rounded-2xl shadow-lg active:scale-95 transition-all text-lg">
-              模擬購買學餐 ($85)
+              模擬掃描完成 ($85)
             </Button>
           </div>
         </div>
@@ -493,14 +489,14 @@ function CampusPayScreen({ onBack }: { onBack: () => void }) {
       )}
 
       {payState === 'success' && (
-        <div className="flex-1 p-6 flex flex-col items-center justify-center animate-in zoom-in-95 duration-500 pb-20">
-          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 shadow-inner">
+        <div className="flex-1 p-6 flex flex-col items-center justify-start animate-in zoom-in-95 duration-500 pb-8 overflow-y-auto">
+          <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 shadow-inner mt-2 shrink-0">
             <CheckCircle className="h-10 w-10 text-green-600" />
           </div>
-          <h2 className="text-2xl font-black text-slate-800 mb-1">付款成功！</h2>
-          <p className="text-slate-500 mb-8 font-medium">已扣款 $85</p>
+          <h2 className="text-2xl font-black text-slate-800 mb-1 shrink-0">付款成功！</h2>
+          <p className="text-slate-500 mb-5 font-medium shrink-0">已扣款 $85</p>
 
-          <div className="w-full bg-white rounded-3xl p-1.5 shadow-lg border border-orange-100 relative overflow-hidden mb-8 animate-in slide-in-from-bottom-4 duration-700">
+          <div className="w-full bg-white rounded-3xl p-1.5 shadow-lg border border-orange-100 relative overflow-hidden mb-4 animate-in slide-in-from-bottom-4 duration-700 shrink-0">
             <div className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl z-10 shadow-sm">限時發送</div>
             <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-[26px] p-5 border border-dashed border-orange-200">
               <div className="flex items-center gap-4">
@@ -519,9 +515,63 @@ function CampusPayScreen({ onBack }: { onBack: () => void }) {
               </div>
             </div>
           </div>
-          <Button onClick={onBack} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-6 rounded-2xl shadow-md active:scale-95 transition-all text-lg">
-            返回首頁查看票券
-          </Button>
+          
+          <div className="w-full flex justify-center mb-6 shrink-0">
+            <button onClick={() => setPayState('report')} className="text-[13px] text-slate-500 hover:text-[#F26722] underline decoration-slate-300 hover:decoration-[#F26722] underline-offset-4 transition-colors font-bold">
+              沒有領取到優惠券？點此申報
+            </button>
+          </div>
+
+          <div className="w-full mt-auto shrink-0 pb-2">
+            <Button onClick={onBack} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-6 rounded-2xl shadow-md active:scale-95 transition-all text-lg mb-4">
+              返回首頁查看票券
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {payState === 'report' && (
+        <div className="flex-1 p-6 flex flex-col animate-in slide-in-from-right-4 duration-300 pb-20 overflow-y-auto">
+          <div className="w-full text-left mb-8 mt-2">
+            <h2 className="text-2xl font-black text-slate-800 mb-3">店家申報與補領</h2>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              若您消費的店家尚未加入學餐名單，請輸入店名申請。<br/>經人工審核通過後，我們將為您補發專屬優惠券！
+            </p>
+          </div>
+          
+          <div className="w-full mb-8">
+            <label className="block text-sm font-bold text-slate-700 mb-3">商家店名</label>
+            <Input 
+              value={storeName}
+              onChange={(e) => setStoreName(e.target.value)}
+              placeholder="請輸入完整商家名稱 (例: 大一餐-八方雲集)" 
+              className="w-full bg-white border-2 border-slate-200 h-14 text-sm rounded-xl focus-visible:ring-[#F26722]"
+            />
+          </div>
+          
+          <div className="w-full bg-orange-50 p-4 rounded-xl border border-orange-100 mb-8 flex items-start">
+            <Info className="h-5 w-5 mr-2 shrink-0 text-[#F26722] mt-0.5" />
+            <p className="text-xs text-orange-800 leading-relaxed">
+              此申請過程將交由人工審核，作業約需 1-3 個工作天，審核結果將透過推播通知您。
+            </p>
+          </div>
+
+          <div className="mt-auto w-full pt-4">
+            <Button 
+              disabled={!storeName.trim() || isSubmitting}
+              onClick={() => {
+                setIsSubmitting(true);
+                setTimeout(() => {
+                  setIsSubmitting(false);
+                  setStoreName('');
+                  setPayState('success'); 
+                }, 1500);
+              }} 
+              className="w-full bg-[#F26722] hover:bg-orange-600 text-white font-bold py-6 rounded-2xl shadow-lg active:scale-95 transition-all text-lg disabled:opacity-50"
+            >
+              {isSubmitting ? <Loader2 className="h-6 w-6 animate-spin" /> : "送出審核申請"}
+            </Button>
+          </div>
         </div>
       )}
     </div>
@@ -529,13 +579,16 @@ function CampusPayScreen({ onBack }: { onBack: () => void }) {
 }
 
 // ==========================================
-// Foodomo 外送揪團
+// Foodomo 外送揪團 (★ 加入 OPEN POINT 支付選項)
 // ==========================================
 function FoodomoGroupScreen({ setActiveScreen }: { setActiveScreen: (screen: ScreenType) => void }) {
   const [view, setView] = useState<'init' | 'host_select_store' | 'host_room_created' | 'member_enter_code' | 'menu' | 'payment' | 'status' | 'success'>('init');
   const [role, setRole] = useState<'host' | 'member'>('host');
   const [roomCode, setRoomCode] = useState('');
   
+  // ★ 新增 selectedPay 狀態，預設為 icash
+  const [selectedPay, setSelectedPay] = useState<'icash' | 'op'>('icash');
+
   const restaurants = [
     { id: 'starbucks', name: "星巴克 (台科大店)", min: 200, fee: 45, items: [{ id: "sb1", name: "大杯美式咖啡", price: 110 }, { id: "sb2", name: "大杯那堤", price: 135 }, { id: "sb3", name: "焦糖瑪奇朵", price: 155 }] },
     { id: 'formosa', name: "鬍鬚張 (台北公館店)", min: 150, fee: 39, items: [{ id: "fm1", name: "招牌魯肉飯", price: 65 }, { id: "fm2", name: "雞肉飯", price: 65 }, { id: "fm3", name: "苦瓜排骨湯", price: 85 }] },
@@ -613,7 +666,7 @@ function FoodomoGroupScreen({ setActiveScreen }: { setActiveScreen: (screen: Scr
               <ShoppingBag className="h-12 w-12 text-[#4CAF50]" />
             </div>
             <h2 className="text-2xl font-black text-slate-800 mb-2">無痛分帳揪團</h2>
-            <p className="text-slate-500 text-sm mb-10 text-center px-4">主揪免代墊免催款，團員各自用 icash Pay 結帳，自動拆分外送費！</p>
+            <p className="text-slate-500 text-sm mb-10 text-center px-4">主揪免代墊免催款，團員各自結帳，自動拆分外送費！</p>
             
             <div className="w-full space-y-4">
               <button onClick={() => { setRole('host'); setView('host_select_store'); setCart({}); }} className="w-full bg-white border-2 border-[#4CAF50] rounded-2xl p-5 flex items-center justify-between hover:bg-green-50 transition-all active:scale-95 shadow-sm group">
@@ -769,16 +822,36 @@ function FoodomoGroupScreen({ setActiveScreen }: { setActiveScreen: (screen: Scr
             </div>
 
             <h2 className="font-bold text-slate-800 mb-3 px-1">選擇付款方式</h2>
-            <button className="w-full p-4 rounded-xl border-2 border-[#4CAF50] bg-green-50 flex items-center gap-3 mb-6 relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-[#4CAF50] text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-bold">限時活動</div>
-              <div className="h-10 w-10 rounded-full bg-[#1CA2D8] flex items-center justify-center shrink-0"><CreditCard className="h-5 w-5 text-white" /></div>
-              <div className="text-left flex-1"><p className="font-bold text-slate-800">icash Pay (授權圈存)</p><p className="text-xs text-slate-500 mt-0.5">餘額 $840</p></div>
-              <div className="h-6 w-6 rounded-full bg-[#4CAF50] flex items-center justify-center shrink-0"><Check className="h-4 w-4 text-white" /></div>
-            </button>
+            <div className="space-y-3 mb-6">
+              {/* ★ 選項一：icash Pay */}
+              <button onClick={() => setSelectedPay('icash')} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-3 relative overflow-hidden ${selectedPay === 'icash' ? 'border-[#4CAF50] bg-green-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                <div className="absolute top-0 right-0 bg-[#4CAF50] text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-bold">限時活動</div>
+                <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${selectedPay === 'icash' ? 'bg-[#1CA2D8]' : 'bg-slate-200'}`}>
+                  <CreditCard className={`h-5 w-5 ${selectedPay === 'icash' ? 'text-white' : 'text-slate-500'}`} />
+                </div>
+                <div className="text-left flex-1">
+                  <p className="font-bold text-slate-800">icash Pay (授權圈存)</p>
+                  <p className="text-xs text-slate-500 mt-0.5">餘額 $840</p>
+                </div>
+                {selectedPay === 'icash' && <div className="h-6 w-6 rounded-full bg-[#4CAF50] flex items-center justify-center shrink-0"><Check className="h-4 w-4 text-white" /></div>}
+              </button>
+
+              {/* ★ 選項二：OPEN POINT 點數扣抵 */}
+              <button onClick={() => setSelectedPay('op')} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-3 ${selectedPay === 'op' ? 'border-[#4CAF50] bg-green-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${selectedPay === 'op' ? 'bg-[#F26722]' : 'bg-slate-200'}`}>
+                  <CreditCard className={`h-5 w-5 ${selectedPay === 'op' ? 'text-white' : 'text-slate-500'}`} />
+                </div>
+                <div className="text-left flex-1">
+                  <p className="font-bold text-slate-800">OPEN POINT 全額扣抵</p>
+                  <p className="text-xs text-slate-500 mt-0.5">可用點數：1,250 點</p>
+                </div>
+                {selectedPay === 'op' && <div className="h-6 w-6 rounded-full bg-[#4CAF50] flex items-center justify-center shrink-0"><Check className="h-4 w-4 text-white" /></div>}
+              </button>
+            </div>
 
             <div className="mt-auto pt-4">
               <Button onClick={handlePayment} className="w-full bg-[#4CAF50] hover:bg-green-600 text-white font-bold py-7 rounded-xl text-xl shadow-lg active:scale-95 transition-transform">
-                確認授權圈存 (${totalFoodPrice})
+                確認授權圈存 ({selectedPay === 'op' ? `${totalFoodPrice} 點` : `$${totalFoodPrice}`})
               </Button>
             </div>
           </div>
@@ -876,11 +949,11 @@ function FoodomoGroupScreen({ setActiveScreen }: { setActiveScreen: (screen: Scr
 }
 
 // ==========================================
-// OP Fast-Pass (★ 完美動態復刻三步驟：解鎖 ➔ 掃描(可加減商品) ➔ 結帳碼)
+// OP Fast-Pass (動態掃描與結帳碼)
 // ==========================================
 function FastPassUnlockScreen({ onUnlock, onBack }: { onUnlock: () => void; onBack: () => void }) {
   return (
-    <div className="relative flex flex-col h-full bg-slate-950">
+    <div className="relative flex flex-col h-screen max-h-screen overflow-hidden bg-slate-950">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-xl" />
       <div className="relative z-10 flex flex-col h-full">
         <div className="p-4"><button onClick={onBack} className="flex items-center gap-1 text-white/70 hover:text-white transition-colors"><X className="h-6 w-6" /></button></div>
@@ -926,14 +999,13 @@ function FastPassScannerScreen({ onNext, onBack }: { onNext: (amount: number) =>
   const totalPrice = cart.reduce((sum, item) => sum + item.price, 0);
 
   return (
-    <div className="flex flex-col h-full bg-[#0B1015] relative">
-      <div className="p-4 flex items-center justify-between">
+    <div className="flex flex-col h-screen max-h-screen overflow-hidden bg-[#0B1015] relative">
+      <div className="p-4 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="flex items-center text-white bg-white/10 px-3 py-1.5 rounded-full hover:bg-white/20 transition-colors"><ArrowLeft className="h-4 w-4 mr-1" /><span className="text-xs font-bold">返回</span></button>
         <h1 className="text-base font-bold text-white">OP Fast-Pass 極速結帳</h1>
         <div className="w-16"></div>
       </div>
       
-      {/* 警告彈窗 (放回貨架通知) */}
       {showAlert && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-300 w-[90%] max-w-[320px]">
           <div className="bg-red-500/95 backdrop-blur-sm text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-bold border border-red-400">
@@ -943,14 +1015,12 @@ function FastPassScannerScreen({ onNext, onBack }: { onNext: (amount: number) =>
         </div>
       )}
 
-      {/* 掃描區塊 */}
-      <div className="flex-1 flex flex-col items-center justify-center relative p-6">
-        <div className="w-64 h-64 border-[3px] border-slate-700/50 rounded-3xl relative mb-6 overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center relative p-4 min-h-0 shrink-0">
+        <div className="w-52 h-52 sm:w-56 sm:h-56 border-[3px] border-slate-700/50 rounded-3xl relative mb-4 overflow-hidden shrink-0">
           <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-400 rounded-tl-3xl"></div>
           <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-400 rounded-tr-3xl"></div>
           <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-400 rounded-bl-3xl"></div>
           <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-400 rounded-br-3xl"></div>
-          {/* 掃描線動畫 */}
           <div className="absolute top-1/2 left-0 w-full h-[1px] bg-green-400 shadow-[0_0_10px_2px_rgba(74,222,128,0.5)] animate-pulse"></div>
         </div>
         <Button onClick={handleScanItem} variant="outline" className="bg-transparent border border-green-900/50 text-green-400 font-bold rounded-full px-6 hover:bg-green-950/30 active:scale-95 transition-transform">
@@ -958,13 +1028,12 @@ function FastPassScannerScreen({ onNext, onBack }: { onNext: (amount: number) =>
         </Button>
       </div>
 
-      {/* 雲端購物車區塊 */}
-      <div className="bg-slate-50 rounded-t-[32px] p-6 pb-8 shadow-[0_-10px_25px_rgba(0,0,0,0.2)] flex flex-col max-h-[45vh]">
+      <div className="bg-slate-50 rounded-t-[32px] p-5 pb-6 shadow-[0_-10px_25px_rgba(0,0,0,0.2)] flex flex-col shrink-0 max-h-[40vh] sm:max-h-[45vh]">
         <div className="flex items-center justify-between mb-4 shrink-0">
           <h2 className="text-lg font-bold text-slate-800">雲端購物車</h2>
           <Badge className="bg-slate-200 text-slate-600 border-0">共 {cart.length} 件</Badge>
         </div>
-        <div className="space-y-3 mb-6 overflow-y-auto flex-1 pr-1">
+        <div className="space-y-3 mb-4 overflow-y-auto flex-1 pr-1">
           {cart.map((item) => (
             <div key={item.id} className="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-slate-100 animate-in slide-in-from-right-2">
               <div className="flex items-center gap-3">
@@ -983,8 +1052,8 @@ function FastPassScannerScreen({ onNext, onBack }: { onNext: (amount: number) =>
             <div className="text-center py-6 text-slate-400 text-sm">購物車目前是空的<br/>請掃描商品</div>
           )}
         </div>
-        <div className="flex items-end justify-between shrink-0 pt-2">
-          <div><p className="text-xs text-slate-500 font-medium mb-1">總金額</p><p className="text-3xl font-black text-[#F26722]">${totalPrice}</p></div>
+        <div className="flex items-end justify-between shrink-0 pt-2 border-t border-slate-200">
+          <div><p className="text-xs text-slate-500 font-medium mb-1 mt-1">總金額</p><p className="text-3xl font-black text-[#F26722]">${totalPrice}</p></div>
           <Button onClick={() => onNext(totalPrice)} disabled={cart.length === 0} className="bg-[#F26722] hover:bg-orange-600 text-white font-bold py-6 px-6 rounded-2xl shadow-lg active:scale-95 text-base disabled:opacity-50">
             <QrCode className="mr-2 h-5 w-5" /> 一鍵生成結帳碼
           </Button>
@@ -996,7 +1065,7 @@ function FastPassScannerScreen({ onNext, onBack }: { onNext: (amount: number) =>
 
 function FastPassGeneratedQRScreen({ amount, onBack }: { amount: number; onBack: () => void }) {
   return (
-    <div className="flex flex-col h-full bg-[#0B1015]">
+    <div className="flex flex-col h-screen max-h-screen overflow-hidden bg-[#0B1015]">
       <div className="p-4 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="flex items-center text-white bg-white/10 px-3 py-1.5 rounded-full hover:bg-white/20 transition-colors"><ArrowLeft className="h-4 w-4 mr-1" /><span className="text-xs font-bold">返回</span></button>
         <h1 className="text-base font-bold text-white">付款結帳碼</h1>
@@ -1022,7 +1091,7 @@ function FastPassGeneratedQRScreen({ amount, onBack }: { amount: number; onBack:
 }
 
 // ==========================================
-// 6. 行動隨時取
+// 行動隨時取
 // ==========================================
 function MobilePickupScreen({ onBack }: { onBack: () => void }) {
   const [activeTab, setActiveTab] = useState("cafe")
@@ -1096,7 +1165,7 @@ function MobilePickupScreen({ onBack }: { onBack: () => void }) {
 }
 
 // ==========================================
-// 7. 小7集點卡
+// 小7集點卡
 // ==========================================
 function SevenPointsScreen({ onBack }: { onBack: () => void }) {
   const campaigns = [
@@ -1141,7 +1210,7 @@ function SevenPointsScreen({ onBack }: { onBack: () => void }) {
 }
 
 // ==========================================
-// 8. i珍食雷達
+// i珍食雷達
 // ==========================================
 function IFoodRadarScreen({ onBack }: { onBack: () => void }) {
   const [activeFilter, setActiveFilter] = useState("all")
@@ -1210,7 +1279,7 @@ function IFoodRadarScreen({ onBack }: { onBack: () => void }) {
 }
 
 // ==========================================
-// 9. 我的 OPENPOINT (點數頁面)
+// 我的 OPENPOINT (點數頁面)
 // ==========================================
 function OPPointsScreen({ onBack }: { onBack: () => void }) {
   const quickActions = [
@@ -1272,7 +1341,7 @@ function OPPointsScreen({ onBack }: { onBack: () => void }) {
 }
 
 // ==========================================
-// 10. 老拉新送泡麵 (Referral)
+// 老拉新送泡麵 (Referral)
 // ==========================================
 function ReferralScreen({ onBack }: { onBack: () => void }) {
   const [copied, setCopied] = useState(false)
@@ -1306,7 +1375,7 @@ function ReferralScreen({ onBack }: { onBack: () => void }) {
 }
 
 // ==========================================
-// 11. 全部功能 (All Features Menu)
+// 全部功能 (All Features Menu)
 // ==========================================
 function AllFeaturesScreen({ setActiveScreen, onBack }: { setActiveScreen: (s: ScreenType) => void, onBack: () => void }) {
   const features = [
@@ -1342,7 +1411,7 @@ function AllFeaturesScreen({ setActiveScreen, onBack }: { setActiveScreen: (s: S
 }
 
 // ==========================================
-// 12. 通知中心 (Notifications)
+// 通知中心 (Notifications)
 // ==========================================
 function NotificationsScreen({ onBack }: { onBack: () => void }) {
   return (
@@ -1366,7 +1435,7 @@ function NotificationsScreen({ onBack }: { onBack: () => void }) {
 }
 
 // ==========================================
-// 13. 我的條碼 (My Barcode)
+// 我的條碼 (My Barcode)
 // ==========================================
 function MyBarcodeScreen({ onBack }: { onBack: () => void }) {
   return (
@@ -1390,7 +1459,7 @@ function MyBarcodeScreen({ onBack }: { onBack: () => void }) {
 }
 
 // ==========================================
-// 14. 品牌專用點 / 服務 / 個人頁面 
+// 品牌專用點 / 服務 / 個人頁面 
 // ==========================================
 function BrandPointsScreen({ onBack }: { onBack: () => void }) {
   return (
@@ -1442,8 +1511,8 @@ function ProfileScreen({ onBack }: { onBack: () => void }) {
             <User className="h-8 w-8 text-slate-500" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-800">披薩</h2>
-            <p className="text-sm text-slate-500">學生認證會員</p>
+            <h2 className="text-xl font-bold text-slate-800">潘同學</h2>
+            <p className="text-sm text-slate-500">台科大認證會員</p>
           </div>
         </div>
       </div>
@@ -1458,7 +1527,7 @@ function ProfileScreen({ onBack }: { onBack: () => void }) {
 export function HomeInteractive() {
   const [activeScreen, setActiveScreen] = useState<ScreenType>('home')
   const [showCouponModal, setShowCouponModal] = useState(false)
-  const [fastPassAmount, setFastPassAmount] = useState(119) // 記錄 Fast-Pass 結帳的總金額
+  const [fastPassAmount, setFastPassAmount] = useState(119) 
 
   const goHome = () => setActiveScreen('home')
   
@@ -1469,7 +1538,7 @@ export function HomeInteractive() {
       case 'campus_pay': return <CampusPayScreen onBack={goHome} />
       case 'foodomo': return <FoodomoGroupScreen setActiveScreen={setActiveScreen} />
       
-      // ★ 完整接回的 Fast-Pass 三步驟 (修好囉)
+      // Fast-Pass 三步驟
       case 'fast_pass_unlock': return <FastPassUnlockScreen onUnlock={() => setActiveScreen('fast_pass_scanner')} onBack={goHome} />
       case 'fast_pass_scanner': return <FastPassScannerScreen onNext={(amount) => { setFastPassAmount(amount); setActiveScreen('fast_pass_generated_qr'); }} onBack={goHome} />
       case 'fast_pass_generated_qr': return <FastPassGeneratedQRScreen amount={fastPassAmount} onBack={goHome} />
@@ -1501,7 +1570,7 @@ export function HomeInteractive() {
               </button>
               
               <div className="flex-1 mx-3 bg-slate-100 hover:bg-slate-200 transition-colors rounded-full py-2 px-4 text-center cursor-pointer">
-                <span className="text-sm font-bold text-slate-700">Hi, 披薩！學生專屬優惠</span>
+                <span className="text-sm font-bold text-slate-700">Hi, 潘同學！台科大專屬優惠</span>
               </div>
               
               <button onClick={() => setActiveScreen('my_barcode')} className="flex flex-col items-center justify-center p-1 hover:opacity-80">
@@ -1559,7 +1628,7 @@ export function HomeInteractive() {
                     </button>
                     <button onClick={() => setActiveScreen('campus_pay')} className="flex-1 flex flex-col items-center justify-center bg-white/20 hover:bg-white/30 rounded-xl transition-colors">
                       <Utensils className="h-7 w-7 text-white mb-1" />
-                      <span className="text-white text-[11px] font-bold">學餐支付</span>
+                      <span className="text-white text-[11px] font-bold">學餐支付 (掃碼)</span>
                     </button>
                   </div>
                   
